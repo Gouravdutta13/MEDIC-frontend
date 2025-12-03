@@ -1,0 +1,586 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================
+   MEDIC Design System - S-COMBO V2 Edition
+   Developed by Gourav Dutta
+   ============================================ */
+
+:root {
+  /* ============================================
+     MEDIC HSL Color Tokens (S-COMBO V2)
+     ============================================ */
+  --color-dark-navy: 222 69% 8%; /* #071022 */
+  --color-light-white: 210 40% 98%; /* #F8FAFC */
+  --color-primary-cyan: 166 100% 45%; /* #00E5BD */
+  --color-secondary-blue: 207 100% 54%; /* #1396FF */
+  --color-warning-yellow: 45 95% 55%;
+
+  /* ============================================
+     LIGHT MODE - Clean White (#F8FAFC)
+     ============================================ */
+  --background: var(--color-light-white);
+  --foreground: 222 47% 11%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+
+  --primary: var(--color-primary-cyan);
+  --primary-foreground: 222 47% 8%;
+
+  --secondary: var(--color-secondary-blue);
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+
+  --accent: var(--color-primary-cyan);
+  --accent-foreground: 222 47% 8%;
+
+  --warning: var(--color-warning-yellow);
+  --warning-foreground: 26 83% 14%;
+
+  --destructive: 358 82% 67%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: var(--color-primary-cyan);
+
+  --chart-1: var(--color-primary-cyan);
+  --chart-2: var(--color-secondary-blue);
+  --chart-3: 174 72% 47%;
+  --chart-4: 187 86% 43%;
+  --chart-5: 199 89% 48%;
+
+  --radius: 0.75rem;
+
+  --sidebar: 210 40% 98%;
+  --sidebar-foreground: 222 47% 11%;
+  --sidebar-primary: var(--color-primary-cyan);
+  --sidebar-primary-foreground: 222 47% 8%;
+  --sidebar-accent: 210 40% 96%;
+  --sidebar-accent-foreground: 222 47% 11%;
+  --sidebar-border: 214 32% 91%;
+  --sidebar-ring: var(--color-primary-cyan);
+
+  /* Z-index scale */
+  --z-base: 1;
+  --z-sidebar: 200;
+  --z-dropdown: 800;
+  --z-popover: 900;
+  --z-modal: 1000;
+  --z-toast: 1100;
+}
+
+/* ============================================
+   DARK MODE - Deep Navy (#071022)
+   ============================================ */
+.dark {
+  --background: var(--color-dark-navy);
+  --foreground: 203 45% 93%;
+
+  --card: 220 54% 13%;
+  --card-foreground: 203 45% 93%;
+
+  --popover: 220 54% 13%;
+  --popover-foreground: 203 45% 93%;
+
+  --primary: var(--color-primary-cyan);
+  --primary-foreground: 222 69% 8%;
+
+  --secondary: var(--color-secondary-blue);
+  --secondary-foreground: 222 69% 8%;
+
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+
+  --accent: var(--color-primary-cyan);
+  --accent-foreground: 222 69% 8%;
+
+  --warning: var(--color-warning-yellow);
+  --warning-foreground: 222 69% 8%;
+
+  --destructive: 358 82% 67%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 217 33% 27%;
+  --input: 217 33% 27%;
+  --ring: var(--color-primary-cyan);
+
+  --sidebar: 222 60% 10%;
+  --sidebar-foreground: 203 45% 93%;
+  --sidebar-primary: var(--color-primary-cyan);
+  --sidebar-primary-foreground: 222 69% 8%;
+  --sidebar-accent: 217 33% 17%;
+  --sidebar-accent-foreground: 203 45% 93%;
+  --sidebar-border: 217 33% 27%;
+  --sidebar-ring: var(--color-primary-cyan);
+}
+
+/* ============================================
+   HIGH CONTRAST - Boosts visibility only
+   ============================================ */
+.high-contrast.dark {
+  --foreground: 0 0% 100%;
+  --muted-foreground: 210 20% 80%;
+  --border: 215 25% 40%;
+}
+
+.high-contrast:not(.dark) {
+  --foreground: 0 0% 0%;
+  --muted-foreground: 215 25% 30%;
+  --border: 215 25% 60%;
+}
+
+/* ============================================
+   ACCENT THEME VARIATIONS
+   ============================================ */
+.theme-clinical {
+  --primary: 199 89% 48%;
+  --secondary: 201 96% 32%;
+  --accent: 199 89% 48%;
+  --ring: 199 89% 48%;
+  --sidebar-primary: 199 89% 48%;
+  --sidebar-ring: 199 89% 48%;
+}
+
+.theme-warm {
+  --primary: 38 92% 50%;
+  --secondary: 32 95% 44%;
+  --accent: 38 92% 50%;
+  --ring: 38 92% 50%;
+  --sidebar-primary: 38 92% 50%;
+  --sidebar-ring: 38 92% 50%;
+}
+
+@theme inline {
+  --font-sans: "Geist", "Geist Fallback", system-ui, sans-serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", monospace;
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  /* Add MEDIC brand colors to @theme inline */
+  --color-medic-dark: #071022;
+  --color-medic-light: #f8fafc;
+  --color-medic-primary: #00e5bd;
+  --color-medic-secondary: #1396ff;
+  --color-medic-warning: hsl(45 95% 55%);
+
+  /* Add shadow utilities */
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-focus: 0 0 0 3px hsl(var(--ring) / 0.3);
+  --shadow-elevated: 0 4px 20px rgba(0, 0, 0, 0.25), 0 0 0 1px hsl(var(--border));
+  --shadow-cinematic: 0 10px 40px rgba(2, 6, 23, 0.6);
+  --shadow-glow: 0 0 20px hsl(var(--primary) / 0.3);
+  --shadow-send-glow: 0 4px 16px hsl(166 100% 45% / 0.4);
+
+  /* Add transition timing functions */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Glass morphism */
+  .glass {
+    background: hsl(var(--card));
+  }
+
+  .dark .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glass-strong {
+    background: hsl(var(--card));
+  }
+
+  .dark .glass-strong {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  /* MEDIC gradient */
+  .gradient-accent {
+    background: linear-gradient(90deg, hsl(var(--color-primary-cyan)) 0%, hsl(var(--color-secondary-blue)) 100%);
+  }
+
+  .gradient-text {
+    background: linear-gradient(90deg, hsl(var(--color-primary-cyan)) 0%, hsl(var(--color-secondary-blue)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Shadow utilities */
+  .shadow-glow {
+    box-shadow: 0 0 20px hsl(var(--color-primary-cyan) / 0.3);
+  }
+
+  .shadow-cinematic {
+    box-shadow: 0 10px 40px rgba(2, 6, 23, 0.6);
+  }
+
+  :root:not(.dark) .shadow-cinematic {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .shadow-elevated {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25), 0 0 0 1px hsl(var(--border));
+  }
+
+  :root:not(.dark) .shadow-elevated {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1), 0 0 0 1px hsl(var(--border));
+  }
+
+  .shadow-soft {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .shadow-card {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .shadow-focus {
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.3);
+  }
+
+  /* Pulsating heartbeat animation - S-COMBO V2 */
+  @keyframes heartbeat {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    14% {
+      transform: scale(1.08);
+    }
+    28% {
+      transform: scale(1);
+    }
+    42% {
+      transform: scale(1.08);
+    }
+    70% {
+      transform: scale(1);
+    }
+  }
+
+  .animate-heartbeat {
+    animation: heartbeat 1.8s ease-in-out infinite;
+  }
+
+  /* Pulse heart class for logo - 1.8s infinite loop */
+  @keyframes pulseHeart {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.08);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .pulse-heart {
+    animation: pulseHeart 1.8s ease-in-out infinite;
+  }
+
+  /* Pulse dot */
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  }
+
+  .pulse-dot {
+    animation: pulse-dot 2s infinite;
+  }
+
+  /* Shimmer effect */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .shimmer {
+    background: linear-gradient(90deg, transparent 0%, hsl(var(--color-primary-cyan) / 0.1) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  /* Loading skeleton animation */
+  @keyframes skeleton-pulse {
+    0%,
+    100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  .skeleton {
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted-foreground) / 0.1) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Touch target for accessibility */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Enhanced button hover with 150ms spring animation */
+  .btn-hover {
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease-out;
+  }
+
+  .btn-hover:hover {
+    transform: scale(1.02) translateY(-1px);
+  }
+
+  .btn-hover:active {
+    transform: scale(0.96);
+    transition: transform 0.08s ease-out;
+  }
+
+  /* Send button specific animation - fast spring on press */
+  .btn-send {
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease-out;
+  }
+
+  .btn-send:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 4px 16px hsl(var(--color-primary-cyan) / 0.4);
+  }
+
+  .btn-send:active {
+    transform: scale(0.92);
+    transition: transform 0.08s ease-out;
+  }
+
+  /* Magnetic cursor hover effect for cards */
+  .magnetic-hover {
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.25s ease-out;
+    will-change: transform;
+  }
+
+  .magnetic-hover:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .dark .magnetic-hover:hover {
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Card hover physics with depth */
+  .card-elevated {
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.2s ease-out;
+  }
+
+  .card-elevated:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .dark .card-elevated:hover {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Developer branding */
+  .developer-credit {
+    font-size: 10px;
+    opacity: 0.5;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  /* Page transition fade-slide */
+  @keyframes fadeSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-slide-in {
+    animation: fadeSlideIn 0.3s ease-out forwards;
+  }
+
+  /* Modal blur-to-focus */
+  @keyframes blurToFocus {
+    from {
+      opacity: 0;
+      filter: blur(8px);
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
+  }
+
+  .animate-blur-to-focus {
+    animation: blurToFocus 0.25s ease-out forwards;
+  }
+
+  /* Message bubble pop-in animation */
+  @keyframes bubblePopIn {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-bubble-pop {
+    animation: bubblePopIn 60ms ease-out forwards;
+  }
+
+  /* Pop-in animation */
+  @keyframes popIn {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-pop-in {
+    animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  /* Fade-slide animation */
+  @keyframes fadeSlide {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-slide {
+    animation: fadeSlide 0.3s ease-out forwards;
+  }
+
+  /* Card depth animation */
+  @keyframes cardDepth {
+    from {
+      transform: translateY(0);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+    to {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  .animate-card-depth {
+    animation: cardDepth 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  }
+}
