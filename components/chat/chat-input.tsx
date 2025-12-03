@@ -108,7 +108,7 @@ export default function ChatInput({ onSendMessage, isLoading = false, disabled =
 
   return (
     <TooltipProvider>
-      <div className="border-t border-border bg-background p-4">
+      <div className="shrink-0 border-t border-border bg-background p-4">
         {/* Attachments preview */}
         <AnimatePresence>
           {attachments.length > 0 && (
@@ -260,7 +260,7 @@ export default function ChatInput({ onSendMessage, isLoading = false, disabled =
               placeholder="Ask MEDIC a health question..."
               disabled={disabled || isLoading}
               rows={1}
-              className="max-h-[200px] min-h-[52px] w-full resize-none bg-transparent px-4 py-3.5 text-base text-foreground placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              className="max-h-[200px] min-h-[52px] w-full resize-none bg-transparent px-4 py-3.5 text-base text-foreground placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 break-words overflow-wrap-break-word"
               aria-label="Message input"
             />
           </div>

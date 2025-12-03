@@ -143,7 +143,16 @@ export default function ChatPage() {
           // Auto-generate title from first user message
           let title = c.title
           if (title === "New Conversation" && messages.length > 0 && messages[0].role === "user") {
-            title = messages[0].content.slice(0, 50) + (messages[0].content.length > 50 ? "..." : "")
+            const content = messages[0].content.trim()
+            // Try to break at word boundaries, max 40 characters
+            if (content.length <= 40) {
+              title = content
+            } else {
+              const truncated = content.slice(0, 40)
+              const lastSpace = truncated.lastIndexOf(" ")
+              // If we find a space near the end, break there; otherwise just truncate
+              title = lastSpace > 25 ? truncated.slice(0, lastSpace) + "..." : truncated + "..."
+            }
           }
 
           return {
@@ -201,7 +210,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="relative flex h-screen w-full overflow-hidden bg-background">
       {/* Sidebar */}
       <AppSidebar
         isOpen={isSidebarOpen}
@@ -217,7 +226,11 @@ export default function ChatPage() {
       />
 
       {/* Main content */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div
+        className={`flex flex-1 flex-col overflow-hidden transition-all duration-200 ease-in-out ${
+          isSidebarOpen ? "lg:ml-72" : "lg:ml-0"
+        }`}
+      >
         {/* Navbar */}
         <Navbar
           onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}

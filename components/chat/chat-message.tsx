@@ -131,7 +131,7 @@ function ChatMessage({ message, onFlagMessage, onSaveMessage, onEditMessage, onD
       )}
 
       {/* Message content */}
-      <div className={`flex max-w-[80%] flex-col gap-2 ${isUser ? "items-end" : "items-start"}`}>
+      <div className={`flex max-w-[80%] min-w-0 flex-col gap-2 ${isUser ? "items-end" : "items-start"}`}>
         {/* Confidence indicator for assistant */}
         {!isUser && message.confidence && message.confidence !== "high" && (
           <div className="flex items-center gap-1.5 text-xs">
@@ -142,7 +142,7 @@ function ChatMessage({ message, onFlagMessage, onSaveMessage, onEditMessage, onD
 
         {/* Message bubble */}
         <div
-          className={`rounded-2xl px-4 py-3 ${
+          className={`rounded-2xl px-4 py-3 break-words overflow-hidden ${
             isUser ? "gradient-accent text-primary-foreground" : "bg-card border border-border"
           }`}
         >
@@ -151,7 +151,7 @@ function ChatMessage({ message, onFlagMessage, onSaveMessage, onEditMessage, onD
               <textarea
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
-                className="w-full min-h-[80px] bg-transparent text-sm resize-none focus:outline-none"
+                className="w-full min-h-[80px] max-h-[300px] bg-transparent text-sm resize-none focus:outline-none overflow-y-auto break-words overflow-wrap-break-word"
                 autoFocus
               />
               <div className="flex gap-2 justify-end">
@@ -166,7 +166,7 @@ function ChatMessage({ message, onFlagMessage, onSaveMessage, onEditMessage, onD
           ) : (
             <>
               <div
-                className={`prose prose-sm max-w-none ${
+                className={`prose prose-sm max-w-none break-words overflow-hidden ${
                   isUser ? "prose-invert" : "dark:prose-invert"
                 } ${!isExpanded && isLongMessage ? "line-clamp-6" : ""}`}
               >
@@ -250,18 +250,6 @@ function ChatMessage({ message, onFlagMessage, onSaveMessage, onEditMessage, onD
             </>
           )}
         </div>
-
-        {/* Source cards for assistant messages */}
-        {!isUser && message.sources && message.sources.length > 0 && (
-          <div className="mt-2 w-full">
-            <p className="mb-2 text-xs font-medium text-muted-foreground">Sources</p>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {message.sources.map((source) => (
-                <SourceCard key={source.id} source={source} />
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Message actions */}
         {!message.isStreaming && (

@@ -89,10 +89,8 @@ export async function* mockStreamResponse(query: string): AsyncGenerator<{
   done: boolean
   sources?: Source[]
 }> {
-  // Simulate initial processing delay
   await sleep(300)
 
-  // Determine response based on query content
   const lowerQuery = query.toLowerCase()
   const responseData =
     lowerQuery.includes("headache") || lowerQuery.includes("head pain")
@@ -102,7 +100,6 @@ export async function* mockStreamResponse(query: string): AsyncGenerator<{
   const content = responseData.content
   const words = content.split(" ")
 
-  // Stream word by word with variable delays for natural feel
   for (let i = 0; i < words.length; i++) {
     const word = words[i]
     const delay = getStreamDelay(word)
@@ -114,7 +111,6 @@ export async function* mockStreamResponse(query: string): AsyncGenerator<{
     }
   }
 
-  // Final yield with sources
   yield {
     content: "",
     done: true,
@@ -126,44 +122,33 @@ export async function* mockStreamResponse(query: string): AsyncGenerator<{
  * Get variable delay based on content for natural streaming
  */
 function getStreamDelay(word: string): number {
-  // Longer pause after punctuation
   if (word.endsWith(".") || word.endsWith("!") || word.endsWith("?")) {
     return 80 + Math.random() * 40
   }
   if (word.endsWith(",") || word.endsWith(":")) {
     return 50 + Math.random() * 30
   }
-  // Markdown headers get slight pause
   if (word.startsWith("#")) {
     return 60
   }
-  // Normal words
   return 15 + Math.random() * 25
 }
 
-/**
- * Promise-based sleep utility
- */
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 /**
  * Send a message and get streaming response
- * ---- ONLY CHANGE: update backend API URL HERE ----
- *
- * This implementation POSTs to the MEDIC backend and converts the returned
- * full answer into a simple streamed word-by-word generator so the UI can
- * display token-like streaming. If the backend call fails we fall back to
- * the local mockStreamResponse.
+ * ---- ONLY CHANGE: updated backend API URL ----
  */
 export async function sendMessage(
   content: string,
   chatId: string,
 ): Promise<AsyncGenerator<{ content: string; done: boolean; sources?: Source[] }>> {
   try {
-    // <-- Set your backend URL here (relative or absolute). Keep as http://127.0.0.1:8000 for local dev.
-    const BACKEND_URL = "http://127.0.0.1:8000/api/chat"
+    // ✅ NEW BACKEND ROUTE (via Next.js)
+    const BACKEND_URL = "/api/medic"
 
     const response = await fetch(BACKEND_URL, {
       method: "POST",
@@ -176,7 +161,6 @@ export async function sendMessage(
     })
 
     if (!response.ok) {
-      // if backend returned an error, log and fallback to mock stream
       console.error("Backend error:", response.status, await response.text().catch(() => "<no body>"))
       return mockStreamResponse(content)
     }
@@ -188,14 +172,11 @@ export async function sendMessage(
 
     if (!data) return mockStreamResponse(content)
 
-    // backend may return 'advice' / 'response' / 'answer' etc.
-    const answer = (data.advice || data.response || data.answer || "").toString()
+    const answer = (data.text || data.advice || data.response || data.answer || "").toString()
     const sources = (data.sources || data.sources_used || data.retrieved_docs || []) as Source[]
 
-    // stream the returned answer word-by-word
     async function* stream() {
       if (!answer || answer.trim().length === 0) {
-        // no textual answer: final yield with sources only
         yield { content: "", done: true, sources }
         return
       }
@@ -204,11 +185,9 @@ export async function sendMessage(
       for (let i = 0; i < words.length; i++) {
         const w = words[i]
         await sleep(getStreamDelay(w))
-        // preserve spacing except possibly at the end
         yield { content: w + (i < words.length - 1 ? " " : ""), done: false }
       }
 
-      // final yield with sources
       yield { content: "", done: true, sources }
     }
 
@@ -237,11 +216,9 @@ export function generateChatId(): string {
  * Mock analytics endpoint
  */
 export function logAnalyticsEvent(event: string, properties?: Record<string, unknown>): void {
-  // Check if analytics is enabled
   const prefs = getStoredPreferences()
   if (!prefs.analyticsEnabled) return
 
-  // TODO: Replace with actual analytics endpoint
   console.log("[MEDIC Analytics]", {
     event,
     timestamp: new Date().toISOString(),
@@ -249,9 +226,6 @@ export function logAnalyticsEvent(event: string, properties?: Record<string, unk
   })
 }
 
-/**
- * Get stored user preferences
- */
 export function getStoredPreferences(): {
   analyticsEnabled: boolean
   theme: string
@@ -288,7 +262,6 @@ export function exportChatToText(messages: Message[]): string {
 export async function exportChatToPDF(messages: Message[], title: string): Promise<void> {
   const content = exportChatToText(messages)
 
-  // Create a simple HTML document for printing
   const printWindow = window.open("", "_blank")
   if (!printWindow) return
 

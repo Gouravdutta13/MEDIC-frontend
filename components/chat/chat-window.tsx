@@ -206,7 +206,7 @@ export default function ChatWindow({ chatId, initialMessages = [], onMessagesCha
 
       <div
         ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto custom-scrollbar"
+        className="flex-1 overflow-y-auto custom-scrollbar min-h-0"
         role="log"
         aria-live="polite"
         aria-label="Chat messages"

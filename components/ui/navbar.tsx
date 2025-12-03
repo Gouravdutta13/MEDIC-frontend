@@ -171,7 +171,7 @@ export default function Navbar({
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="sticky top-0 z-40 border-b border-border bg-background"
+        className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
         role="banner"
       >
         <div className="flex h-14 items-center justify-between px-4 lg:px-6">

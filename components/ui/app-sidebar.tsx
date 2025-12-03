@@ -119,7 +119,7 @@ export default function AppSidebar({
   const [chatToDelete, setChatToDelete] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
-  // Sort chats: pinned first, then by date
+  // Sort chats
   const pinnedChats = chats
     .filter((c) => c.isPinned)
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
@@ -158,7 +158,7 @@ export default function AppSidebar({
     setChatToDelete(null)
   }
 
-  // Share chat as JSON
+  // Copy JSON
   const handleShareChat = useCallback(async (chat: Chat) => {
     const exportData = {
       title: chat.title,
@@ -169,30 +169,23 @@ export default function AppSidebar({
         timestamp: m.timestamp,
       })),
     }
-    const jsonString = JSON.stringify(exportData, null, 2)
-
     try {
-      await navigator.clipboard.writeText(jsonString)
+      await navigator.clipboard.writeText(JSON.stringify(exportData, null, 2))
       setCopiedId(chat.id)
       setTimeout(() => setCopiedId(null), 2000)
     } catch (err) {
-      console.error("Failed to copy:", err)
+      console.error(err)
     }
   }, [])
 
-  // Download chat as JSON file
+  // Download JSON
   const handleDownloadChat = useCallback((chat: Chat) => {
     const exportData = {
       title: chat.title,
       createdAt: chat.createdAt,
-      messages: chat.messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-        timestamp: m.timestamp,
-      })),
+      messages: chat.messages,
     }
-    const jsonString = JSON.stringify(exportData, null, 2)
-    const blob = new Blob([jsonString], { type: "application/json" })
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
@@ -201,18 +194,17 @@ export default function AppSidebar({
     URL.revokeObjectURL(url)
   }, [])
 
+  // Chat item renderer
   const renderChatItem = (chat: Chat, index: number) => (
     <motion.div
       key={chat.id}
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.03 }}
-      className="group"
-      role="listitem"
-      draggable={chat.isPinned}
+      className="group w-full min-w-0"
     >
       {editingChatId === chat.id ? (
-        <div className="flex items-center gap-1 rounded-lg border border-primary/50 bg-muted p-1">
+        <div className="flex items-center gap-1 rounded-lg border border-primary/50 bg-muted p-1 min-w-0">
           <input
             type="text"
             value={editTitle}
@@ -221,140 +213,90 @@ export default function AppSidebar({
               if (e.key === "Enter") saveEdit()
               if (e.key === "Escape") cancelEdit()
             }}
-            className="flex-1 bg-transparent px-2 py-1 text-sm text-foreground focus:outline-none"
+            className="flex-1 min-w-0 bg-transparent px-2 py-1 text-sm text-foreground focus:outline-none max-w-full"
             autoFocus
-            aria-label="Edit conversation title"
+            maxLength={100}
           />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={saveEdit}
-            className="h-8 w-8 text-primary touch-target"
-            aria-label="Save title"
-          >
+          <Button variant="ghost" size="icon" onClick={saveEdit} className="h-8 w-8">
             <Check className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={cancelEdit}
-            className="h-8 w-8 text-muted-foreground touch-target"
-            aria-label="Cancel editing"
-          >
+          <Button variant="ghost" size="icon" onClick={cancelEdit} className="h-8 w-8">
             <X className="h-4 w-4" />
           </Button>
         </div>
       ) : (
         <div
-          className={`flex w-full items-center gap-2 rounded-xl px-2 py-2 text-left text-sm transition-all duration-200 ${
+          className={`flex w-full min-w-0 items-center gap-2 rounded-xl px-2 py-2 text-left text-sm transition-all ${
             currentChatId === chat.id
-              ? "bg-primary/10 text-foreground border border-primary/20"
-              : "text-foreground hover:bg-muted/60 border border-transparent"
+              ? "bg-primary/10 border border-primary/20"
+              : "hover:bg-muted/60 border border-transparent"
           }`}
         >
-          {/* Pin indicator */}
           <div className="flex h-8 w-8 shrink-0 items-center justify-center">
-            {chat.isPinned ? (
-              <Pin className="h-4 w-4 text-primary" />
-            ) : (
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-            )}
+            {chat.isPinned ? <Pin className="h-4 w-4 text-primary" /> : <MessageSquare className="h-4 w-4" />}
           </div>
 
           <button
             onClick={() => onSelectChat(chat.id)}
-            className="flex-1 truncate text-left focus:outline-none focus:ring-2 focus:ring-ring rounded px-1"
-            aria-current={currentChatId === chat.id ? "true" : undefined}
+            className="flex-1 min-w-0 px-1 text-left overflow-hidden"
+            title={chat.title}
           >
-            {chat.title}
+            <span className="block truncate text-sm">{chat.title}</span>
           </button>
 
-          {/* 3-dot menu with smooth animation */}
+          {/* Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md opacity-0 group-hover:opacity-100 hover:bg-muted/80 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring transition-opacity touch-target"
-                aria-label="Chat options"
-                onClick={(e) => e.stopPropagation()}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md opacity-0 group-hover:opacity-100 hover:bg-muted/80"
               >
                 <MoreVertical className="h-4 w-4" />
               </motion.button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-48 bg-popover border-border shadow-elevated z-[var(--z-dropdown)]"
-            >
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onPinChat(chat.id)
-                }}
-                className="cursor-pointer"
-              >
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => onPinChat(chat.id)}>
                 {chat.isPinned ? (
                   <>
-                    <PinOff className="mr-2 h-4 w-4" />
-                    Unpin
+                    <PinOff className="mr-2 h-4 w-4" /> Unpin
                   </>
                 ) : (
                   <>
-                    <Pin className="mr-2 h-4 w-4" />
-                    Pin
+                    <Pin className="mr-2 h-4 w-4" /> Pin
                   </>
                 )}
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation()
-                  startEditing(chat)
-                }}
-                className="cursor-pointer"
-              >
-                <Pencil className="mr-2 h-4 w-4" />
-                Rename
+
+              <DropdownMenuItem onClick={() => startEditing(chat)}>
+                <Pencil className="mr-2 h-4 w-4" /> Rename
               </DropdownMenuItem>
+
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleShareChat(chat)
-                }}
-                className="cursor-pointer"
-              >
+
+              <DropdownMenuItem onClick={() => handleShareChat(chat)}>
                 {copiedId === chat.id ? (
                   <>
-                    <Check className="mr-2 h-4 w-4 text-primary" />
-                    <span className="text-primary">Copied!</span>
+                    <Check className="mr-2 h-4 w-4 text-primary" /> Copied!
                   </>
                 ) : (
                   <>
-                    <Copy className="mr-2 h-4 w-4" />
-                    Copy as JSON
+                    <Copy className="mr-2 h-4 w-4" /> Copy JSON
                   </>
                 )}
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleDownloadChat(chat)
-                }}
-                className="cursor-pointer"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download JSON
+
+              <DropdownMenuItem onClick={() => handleDownloadChat(chat)}>
+                <Download className="mr-2 h-4 w-4" /> Download JSON
               </DropdownMenuItem>
+
               <DropdownMenuSeparator />
+
               <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handleDeleteClick(chat.id)
-                }}
-                className="cursor-pointer text-destructive focus:text-destructive"
+                className="text-destructive"
+                onClick={() => handleDeleteClick(chat.id)}
               >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
+                <Trash2 className="mr-2 h-4 w-4" /> Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -365,7 +307,7 @@ export default function AppSidebar({
 
   return (
     <TooltipProvider>
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {isOpen && (
           <>
             {/* Mobile overlay */}
@@ -383,16 +325,16 @@ export default function AppSidebar({
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -280, opacity: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="fixed left-0 top-0 z-[var(--z-sidebar)] flex h-full w-72 flex-col border-r border-border bg-background lg:relative lg:z-auto"
+              className="fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-border bg-background shadow-lg lg:z-40"
             >
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-border p-4">
+              <div className="flex shrink-0 items-center justify-between border-b border-border p-4 bg-background">
                 <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-accent animate-heartbeat">
                     <Activity className="h-5 w-5 text-primary-foreground" />
                   </div>
                   <div>
-                    <h1 className="text-lg font-bold text-foreground">MEDIC</h1>
+                    <h1 className="text-lg font-bold">MEDIC</h1>
                     <p className="text-[10px] text-muted-foreground">AI Medical Assistant</p>
                   </div>
                 </div>
@@ -401,78 +343,69 @@ export default function AppSidebar({
                   size="icon"
                   onClick={onToggle}
                   className="h-8 w-8 lg:hidden"
-                  aria-label="Close sidebar"
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
 
-              {/* New chat button */}
-              <div className="p-3">
+              {/* New chat */}
+              <div className="shrink-0 p-3 bg-background">
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button onClick={onNewChat} className="w-full gap-2 gradient-accent text-primary-foreground">
+                  <Button onClick={onNewChat} className="w-full gap-2 gradient-accent text-white">
                     <Plus className="h-4 w-4" />
                     New Chat
                   </Button>
                 </motion.div>
               </div>
 
-              <ScrollArea className="flex-1">
-                {/* Pinned chats */}
+              {/* FIXED: ScrollArea height */}
+              <ScrollArea className="flex-1 min-h-0 w-full">
+                {/* Pinned */}
                 {pinnedChats.length > 0 && (
-                  <div className="px-3 py-2">
-                    <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <div className="px-3 py-2 w-full min-w-0">
+                    <h3 className="mb-2 px-2 text-xs font-semibold uppercase text-muted-foreground">
                       Pinned
                     </h3>
-                    <div className="space-y-1" role="list" aria-label="Pinned conversations">
+                    <div className="space-y-1 w-full min-w-0">
                       {pinnedChats.map((chat, index) => renderChatItem(chat, index))}
                     </div>
                   </div>
                 )}
 
-                {/* Recent chats */}
-                <div className="px-3 py-2">
-                  <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {/* Recent */}
+                <div className="px-3 py-2 w-full min-w-0">
+                  <h3 className="mb-2 px-2 text-xs font-semibold uppercase text-muted-foreground">
                     Recent Chats
                   </h3>
-                  <div className="space-y-1" role="list" aria-label="Recent conversations">
+                  <div className="space-y-1 w-full min-w-0">
                     {unpinnedChats.map((chat, index) => renderChatItem(chat, index))}
-
-                    {chats.length === 0 && (
-                      <div className="flex flex-col items-center justify-center py-8 text-center">
-                        <MessageSquare className="mb-2 h-8 w-8 text-muted-foreground/40" />
-                        <p className="text-xs text-muted-foreground">No conversations yet</p>
-                        <p className="text-[10px] text-muted-foreground/60">Start a new chat to begin</p>
-                      </div>
-                    )}
                   </div>
                 </div>
 
-                {/* Medical tools */}
-                <div className="px-3 py-2">
-                  <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {/* Tools */}
+                <div className="px-3 py-2 w-full min-w-0">
+                  <h3 className="mb-2 px-2 text-xs font-semibold uppercase text-muted-foreground">
                     Medical Tools
                   </h3>
-                  <div className="space-y-2">
+                  <div className="space-y-2 w-full">
                     {MEDICAL_TOOLS.map((tool, index) => (
                       <motion.button
                         key={tool.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 + index * 0.05 }}
-                        whileHover={{ scale: 1.01, y: -2 }}
-                        whileTap={{ scale: 0.99 }}
+                        transition={{ delay: index * 0.05 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => onOpenTool(tool.id)}
-                        className="group flex w-full items-center gap-3 rounded-xl border border-border bg-card p-3 text-left transition-all hover:border-primary/30 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring magnetic-hover"
-                        aria-label={`Open ${tool.label}`}
+                        className="group flex w-full items-center gap-3 rounded-xl border border-border bg-card p-3 text-left transition-all hover:border-primary/30 hover:shadow-md"
                       >
                         <div
-                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${tool.gradient}`}
+                          className={`flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${tool.gradient}`}
                         >
                           <tool.icon className="h-5 w-5 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground">{tool.label}</p>
+                          <p className="text-sm font-medium">{tool.label}</p>
                           <p className="truncate text-xs text-muted-foreground">{tool.description}</p>
                         </div>
                       </motion.button>
@@ -481,17 +414,17 @@ export default function AppSidebar({
                 </div>
               </ScrollArea>
 
-              {/* Footer with developer credit */}
-              <div className="border-t border-border p-3 space-y-1">
-                <p className="text-center text-[10px] text-muted-foreground">MEDIC v1.0 - AI Medical Assistant</p>
-                <p className="text-center developer-credit text-muted-foreground">Developed by Gourav Dutta</p>
+              {/* Footer */}
+              <div className="shrink-0 border-t border-border p-3 text-center text-[10px] text-muted-foreground space-y-1 bg-background">
+                <p>MEDIC v1.0 — AI Medical Assistant</p>
+                <p className="developer-credit">Developed by Gourav Dutta</p>
               </div>
             </motion.aside>
           </>
         )}
       </AnimatePresence>
 
-      {/* Collapsed toggle for desktop */}
+      {/* Toggle Button */}
       {!isOpen && (
         <motion.button
           initial={{ opacity: 0, x: -20 }}
@@ -499,27 +432,24 @@ export default function AppSidebar({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={onToggle}
-          className="fixed left-4 top-4 z-30 hidden rounded-lg border border-border bg-card p-2 shadow-md hover:bg-muted lg:block focus:outline-none focus:ring-2 focus:ring-ring"
-          aria-label="Open sidebar"
+          className="fixed left-4 top-4 z-30 hidden rounded-lg border border-border bg-card p-2 shadow-md lg:block"
         >
           <ChevronLeft className="h-5 w-5 rotate-180" />
         </motion.button>
       )}
 
+      {/* Delete dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-popover border-border shadow-cinematic">
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-foreground">Delete Conversation</AlertDialogTitle>
-            <AlertDialogDescription className="text-muted-foreground">
-              Are you sure you want to delete this conversation? This action cannot be undone.
+            <AlertDialogTitle>Delete Conversation</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-muted hover:bg-muted/80">Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-white">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
