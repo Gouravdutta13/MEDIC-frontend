@@ -28,11 +28,20 @@ export default function SignOutPage() {
         <div className="mb-6 mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-muted">
           <LogOut className="h-10 w-10 text-muted-foreground" />
         </div>
+
         <h1 className="text-2xl font-bold text-foreground mb-2">Signed Out</h1>
+
         <p className="text-muted-foreground mb-8">
           You have been signed out successfully. Your local data has been cleared.
         </p>
-        <Button onClick={() => router.push("/")} className="gradient-accent text-primary-foreground gap-2">
+
+        <Button
+          onClick={() => router.push("/")}
+          className="gradient-accent text-primary-foreground gap-2"
+        >
           Return to MEDIC
         </Button>
-      </motion.div\
+      </motion.div>
+    </div>
+  )
+}
